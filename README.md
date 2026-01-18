@@ -1,1 +1,61 @@
 # so_data_availability
+
+## Installation guide
+
+### Instructions
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/myokyunghan/so_data_availability.git
+   cd so_data_availability
+   ```
+2. Construct python virtual environment
+   ```bash
+   # in the 'so_data_availability' directory
+   brew install pyenv
+   echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.zshrc
+   echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.zshrc
+   echo 'eval "$(pyenv init --path)"' >> ~/.zshrc
+   echo 'eval "$(pyenv init -)"' >> ~/.zshrc
+   source ~/.zshrc
+   
+   pyenv install 3.10.12
+   pyenv versions
+   ```
+   ```bash
+   sudo apt install build-essential curl git libssl-dev zlib1g-dev \
+   libbz2-dev libreadline-dev libsqlite3-dev libffi-dev liblzma-dev tk-dev
+
+   curl https://pyenv.run | bash
+
+   # ~/.zshrc
+   export PYENV_ROOT="$HOME/.pyenv"
+   export PATH="$PYENV_ROOT/bin:$PATH"
+   eval "$(pyenv init --path)"
+   eval "$(pyenv init -)"
+
+   source ~/.zshrc
+
+   pyenv install 3.10.12
+   ```
+
+
+3. Activate the virtual environment 
+   ```bash
+   # in the 'so_data_availability' directory
+   pyenv local 3.10.12
+   python3 -m venv venv_so_data_availability
+   source venv_so_data_availability/bin/activate
+   ```
+   
+4. Install dependencies
+   ```bash
+    # in the 'so_data_availability' directory
+   pip install -r requirements.txt
+   ```
+   * Installation typically takes approximately 10-15 minutes on a standard desktop comuter, excluding GPU driver and CUDA installation.
+
+5. Setting the path
+    ```bash
+   # in the 'so_data_availability' directory
+   pip install -e .
+   ```

@@ -1,17 +1,11 @@
-import sys, os
-
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-PARENT_DIR = os.path.dirname(CURRENT_DIR)
-    
-sys.path.append(PARENT_DIR)
-
+import os
 import pprint
 from glob import glob
-from bert_based_models import load_bert_based_model_from_config
-from lda_model import load_lda_model_from_config
-from config import RunnerConfig
+from topic_modeling.bert_based_models import load_bert_based_model_from_option
+from topic_modeling.lda_model import load_lda_model_from_option
+from topic_modeling.options import RunnerOptions
+from setting_for_sda.constants import CONSTANTS
 from utils.file_io import load_json, save_json
-from utils.datetime_handler import get_monthly_datetime_str
 from utils.sublist import (get_sublist_of_desired_date_range,
                          get_sublist_of_desired_tags)
 
@@ -19,56 +13,58 @@ from utils.sublist import (get_sublist_of_desired_date_range,
 
 class ModelRunner:
     def __init__(self):
-        self.runner_config = RunnerConfig()
+        self.runner_opt = RunnerOptions()
+
         self.model_in_run = None
         self.model = None
-        self.config = None
+        
+        self.option = None
+
         self.data_dir = None
         self.data_dir_for_fit = None
         self.save_dir = None
         self.save_length = 10000
-        self.load_config_and_topic_model()
-        self.load_dirs_from_config()
+        self.load_option_and_topic_model()
+        self.load_dirs_from_option()
 
     def __call__(self):
         self.run()
 
     def run(self):
-        pprint.pp(self.config)
+        pprint.pp(self.option)
         self.run_model_and_save_data()
-        self.save_config()
+        self.save_option()
 
-    def load_config_and_topic_model(self):
+    def load_option_and_topic_model(self):
         """
 
         Returns:
             None
         """
-        self.model_in_run = self.runner_config.model_in_run
+        self.model_in_run = self.runner_opt.model_in_run
         if self.model_in_run == "bert_based":
-            self.config = self.runner_config.bert_based_config
-            self.model = load_bert_based_model_from_config(
-                self.config["model_config"]
+            self.option = self.runner_opt.bert_based_opt
+            self.model = load_bert_based_model_from_option(
+                self.option["model_option"]
             )
         elif self.model_in_run == "lda":
-            self.config = self.runner_config.lda_config
-            self.model = load_lda_model_from_config(
-                self.config["model_config"]
+            self.option = self.runner_opt.lda_opt
+            self.model = load_lda_model_from_option(
+                self.option["model_option"]
             )
         else:
             raise ValueError("'bert_based' and 'lda' are supported")
 
-    def load_dirs_from_config(self):
+    def load_dirs_from_option(self):
         """
 
         Returns:
             None
         """
-        run_id = self.config['run_id']
-        self.data_dir = self.config['data_dir']
-        self.save_dir = f'../result/{self.model_in_run}/run_id_{run_id}'
+        run_id = self.option['run_id']
+        self.data_dir = self.option['data_dir']
+        self.save_dir = f"{self.option['save_dir']}/run_id_{run_id}"
         os.makedirs(f"{self.save_dir}/data", exist_ok=True)
-
 
     def load_all_files(self):
         """
@@ -77,7 +73,6 @@ class ModelRunner:
             a list of dict
         """
         file_list = glob(f'{self.data_dir}/*.json')
-        print(f">>>>>>>>>>>>>>>>>>>>>>load_all_files : {file_list}")
         to_return = []
         for file in file_list:
             loaded = load_json(file)
@@ -93,7 +88,6 @@ class ModelRunner:
         """
         if self.data_dir_for_fit is not None : 
             file_list = glob(f'{self.data_dir_for_fit}/*.json')
-            print(f">>>>>>>>>>>>>>>>>>>>>>load_all_files_for_fit : {file_list}")
             to_return = []
             for file in file_list:
                 loaded = load_json(file)
@@ -111,10 +105,10 @@ class ModelRunner:
         """
         data = self.load_all_files()
         fit_data = self.load_all_files_for_fit()
-        if self.config["selected_tags"] is not None:
+        if self.option["selected_tags"] is not None:
             data = get_sublist_of_desired_tags(data,
-                                               self.config["selected_tags"])
-        result = self.model.run_model_and_get_output_list(data, fit_data)
+                                               self.option["selected_tags"])
+        result = self.model.run_model_and_get_output_list(data)
         topic_info = self.model.get_topic_info()
         save_json(topic_info, f"{self.save_dir}/topic_info.json")
         self.save_data(result)
@@ -140,15 +134,16 @@ class ModelRunner:
             to_save = list_[start_idx:]
             save_json(to_save, f"{self.save_dir}/data/{iters}.json")
 
-    def save_config(self):
+    def save_option(self):
         """
 
         Returns:
             None
         """
-        save_json(self.config, f'{self.save_dir}/config.json')
+        save_json(self.option, f'{self.save_dir}/option.json')
 
 
+## for test
 if __name__ == '__main__':
     runner = ModelRunner()
     runner()

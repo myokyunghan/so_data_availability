@@ -4,72 +4,72 @@ from bertopic import BERTopic
 from sklearn.cluster import KMeans
 from sklearn.feature_extraction.text import CountVectorizer
 from transformers.pipelines import pipeline
-from preprocess import Preprocessor
+from topic_modeling.preprocess import Preprocessor
 from sentence_transformers import SentenceTransformer
   
 
 
 
-def get_components_from_config(model_config):
+def get_components_from_option(model_option):
     """
 
     Args:
-        model_config: a dict
+        model_option: a dict
 
     Returns:
         a tuple of (nr_topics, vectorizer, clustering)
     """
-    nr_topics = model_config["nr_topics"]
+    nr_topics = model_option["nr_topics"]
 
-    if model_config["clustering"] is None:
+    if model_option["clustering"] is None:
         clustering = None
     else:
-        if model_config["clustering"]["name"] == "kmeans":
+        if model_option["clustering"]["name"] == "kmeans":
             clustering = KMeans(
-                n_clusters=model_config["clustering"]["n_clusters"]
+                n_clusters=model_option["clustering"]["n_clusters"]
             )
         else:
             raise ValueError(f'Clustering algorithm not supported:'
-                             f' {model_config["clustering"]["name"]}')
+                             f' {model_option["clustering"]["name"]}')
 
-    if model_config["vectorizer"] is None:
+    if model_option["vectorizer"] is None:
         vectorizer = None
-    elif model_config["vectorizer"] == "CountVectorizer":
+    elif model_option["vectorizer"] == "CountVectorizer":
         vectorizer = CountVectorizer(stop_words='english')
     else:
         raise ValueError(f'Vectorizer not supported: '
-                         f'{model_config["vectorizer"]}')
+                         f'{model_option["vectorizer"]}')
     
-    if model_config["embedding_model"] is None:
+    if model_option["embedding_model"] is None:
         embedding_model = None
-    elif model_config["embedding_model"] == 'all-MiniLM-L6-v2':
-        embedding_model = SentenceTransformer(model_config["embedding_model"])
+    elif model_option["embedding_model"] == 'all-MiniLM-L6-v2':
+        embedding_model = SentenceTransformer(model_option["embedding_model"])
     else:
         raise ValueError(f'embedding_model not supported: '
-                         f'{model_config["embedding_model"]}')
+                         f'{model_option["embedding_model"]}')
 
     return nr_topics, vectorizer, clustering, embedding_model
 
 
-def load_bert_based_model_from_config(model_config):
+def load_bert_based_model_from_option(model_option):
     """
 
     Args:
-        model_config: a dict
+        model_option: a dict
 
     Returns:
         a Bert-based topic model instance
     """
-    nr_topics, vectorizer, clustering, embedding_model = get_components_from_config(
-        model_config)
-    if model_config["model_type"] == "text":
+    nr_topics, vectorizer, clustering, embedding_model = get_components_from_option(
+        model_option)
+    if model_option["model_type"] == "text":
         to_return = TextBERTopicModel(
             nr_topics=nr_topics,
             vectorizer=vectorizer,
             clustering=clustering,
             embedding_model=embedding_model
         )
-    elif model_config["model_type"] == "code":
+    elif model_option["model_type"] == "code":
         if cuda.is_available():
             device = "cuda:0"
         else:

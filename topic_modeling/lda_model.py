@@ -1,22 +1,22 @@
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation as LDA
-from preprocess import Preprocessor
+from topic_modeling.preprocess import Preprocessor
 
 
-def load_lda_model_from_config(model_config):
+def load_lda_model_from_option(model_option):
     """
 
     Args:
-        model_config: a dict
+        model_option: a dict
 
     Returns:
         a LDATopicModel instance
     """
-    n_components = model_config['n_components']
-    max_df = model_config['max_df']
-    min_df = model_config['min_df']
-    attach_suffix = model_config['attach_suffix']
+    n_components = model_option['n_components']
+    max_df = model_option['max_df']
+    min_df = model_option['min_df']
+    attach_suffix = model_option['attach_suffix']
     to_return = LDATopicModel(n_components, max_df, min_df, attach_suffix)
     return to_return
 

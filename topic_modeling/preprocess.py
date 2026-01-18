@@ -4,7 +4,7 @@ from keyword import kwlist
 from string import punctuation
 from tqdm import tqdm
 from nltk.corpus import stopwords
-from constants import CONSTANTS
+from setting_for_sda.constants import CONSTANTS
 
 
 class HTMLParser:
