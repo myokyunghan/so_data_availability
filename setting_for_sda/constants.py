@@ -23,7 +23,8 @@ class CONSTANTS:
                         "#35978f",  # muted teal
                         "#01665e",  # deep green
                         "#003c30",  # near-black green
-                        "#f5f5f5"   # pale gray (neutral base)
+                        # "#f5f5f5"   # pale gray (neutral base)
+                        "#8f8f8f"
                     ]]
     color_map_str = ["cool", "viridis"]
     chatgpt_release_date = "2022.11.30"

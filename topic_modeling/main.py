@@ -12,8 +12,8 @@ from utils.sublist import (get_sublist_of_desired_date_range,
 
 
 class ModelRunner:
-    def __init__(self):
-        self.runner_opt = RunnerOptions()
+    def __init__(self, runner_opt):
+        self.runner_opt = runner_opt
 
         self.model_in_run = None
         self.model = None
