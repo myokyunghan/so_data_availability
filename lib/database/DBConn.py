@@ -1,4 +1,4 @@
-import config.config as conf
+import setting_for_sda.config as conf
 import psycopg2
 import psycopg2.extras
 
@@ -14,13 +14,13 @@ class DBConn:
     def __init__(self):
         if self._conn is None:
             self._conn = psycopg2.connect(
-                host=conf.database_user['host'],
-                dbname=conf.database_user['dbname'],
-                user=conf.database_user['user'],
-                password=conf.database_user['password']
-            )
+                            host    =conf.database_info['host'],
+                            dbname  =conf.database_info['dbname'],
+                            user    =conf.database_info['user'],
+                            password=conf.database_info['password']
+                        )
             with self._conn.cursor() as cur:
-                cur.execute(f"SET search_path TO {conf.SCHEMA_NAME}")
+                cur.execute(f"SET search_path TO {conf.database_info['schema']}")
 
     def cursor(self):
         """항상 새로운 cursor 반환"""

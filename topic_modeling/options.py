@@ -31,7 +31,7 @@ class RunnerOptions:
                                     "data_dir": f"{CONSTANTS.data_root_dir}/data/{snapshot}/questions/python/{year_range}",    
                                     "save_dir": f"{CONSTANTS.data_root_dir}/result/bert_based",    
                                     "selected_tags": None,
-                                    "snapshot":{snapshot},
+                                    "snapshot": 'f{snapshot}',
                                     "model_option": {
                                         "model_type": "text",
                                         "clustering": {
@@ -55,7 +55,7 @@ class RunnerOptions:
                             "data_dir": f"{CONSTANTS.data_root_dir}/data/{snapshot}/questions/python/{year_range}",    
                             "save_dir": f"{CONSTANTS.data_root_dir}/result/lda",    
                             "selected_tags": None,
-                            "snapshot": {snapshot},
+                            "snapshot": 'f{snapshot}',
                             "model_option": {
                                 "n_components": 50,
                                 "max_df": 0.8,
