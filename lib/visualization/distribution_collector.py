@@ -3,6 +3,7 @@ from lib.utils.statistics import (get_monthly_topics_counts, get_topics_counts,
                               get_tags_counts, get_fractional_values_dict)
 from lib.utils.file_io import *
 from lib.utils.sublist import get_sublist_of_desired_date_range
+import numpy as np
 
 
 def get_top_and_bottom_topics(data_dir):
@@ -126,3 +127,32 @@ def collect_tag_distributions(window, data_dir):
             date_range, data_dir, all_tags)
         to_return.append(topic_distribution)
     return to_return
+
+def collect_top_bottom_tags(df):
+    """
+
+    Args:
+        df: calculated dataframe for tag distribution (columns: 'cdate', 'id', 'tag', 'cnt', 'tot_cnt', 'pct')
+        
+    Returns:
+        a list of dict
+    """
+    df_bf_pro = df[df['rel_week']<0].groupby(['tag']).sum(['pct'])['pct'].sort_values().reset_index()
+    tagnum = int(np.floor(df_bf_pro.shape[0]*0.2))
+    bot_tag = list(df_bf_pro.iloc[:tagnum, 0])
+    top_tag = list(df_bf_pro.iloc[tagnum:, 0])
+
+    # stackedbar를 위한 계산 수행 (전체 대비 비율 계산 및 주차별 합산 계산)
+    df_tot = df.groupby(['rel_week']).sum(['pct'])['pct'].reset_index(name = 'tot_pct')
+    df_pct = pd.merge(df, df_tot, on = 'rel_week')
+
+    df_pct['pct_pct'] = df_pct['pct']/df_pct['tot_pct']
+
+    df_pct_bot = df_pct[df_pct['tag'].isin(bot_tag)]
+    df_pct_top = df_pct[df_pct['tag'].isin(top_tag)]
+
+    df_pct_top_tot = df_pct_top.groupby(['rel_week']).sum(['pct_pct'])['pct_pct'].reset_index()
+    df_pct_bot_tot = df_pct_bot.groupby(['rel_week']).sum(['pct_pct'])['pct_pct'].reset_index()
+
+    return {'Top 20% Tags' : df_pct_top_tot,   'Bottom 20% Tags' : df_pct_bot_tot}
+

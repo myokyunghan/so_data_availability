@@ -22,8 +22,8 @@ class ModelRunner:
         self.run()
 
     def run(self):
-        create_dir(self.save_dir)
-        self.create_view('create_v_tag_proportion', (self.startdate, self.end_date, f'%<{self.lang}>%'))
+        create_dir(f'{self.save_dir}/data')
+        self.create_view('create_v_tag_proportion', (self.startdate, self.end_date, f'%<{self.lang}>%', self.lang))
         rows = self.select_data('select_v_tag_proportion')
         self.save_data(rows)
         self.save_option()

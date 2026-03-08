@@ -12,11 +12,12 @@ sql_collection = {
                             FROM posts p
 
                             CROSS JOIN LATERAL
-                                regexp_matches(p.tags, '<([^>]+)>', 'g') AS t(tag)
+                                unnest(string_to_array(trim(both '<>' from p.tags), '><')) AS t(tag)
 
                             WHERE p.posttypeid = '1'
                             AND p.creationdate BETWEEN %s AND %s
-                            AND p.tags LIKE %s;""",
+                            AND p.tags LIKE %s
+                            AND t.tag <> %s;""",
     "drop_v_tag_proportion" : """DROP VIEW IF EXISTS v_tag_proportion;""",
     "select_v_tag_proportion" : """select * from v_tag_proportion a;"""
 }

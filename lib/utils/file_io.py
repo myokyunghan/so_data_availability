@@ -1,5 +1,7 @@
 import json
 import os
+import shutil
+import pandas as pd
 from setting_for_sda.constants import CONSTANTS
 
 def load_json(path):
@@ -44,6 +46,36 @@ def create_dir(path):
     Returns:
         None
     """
+    if os.path.exists(path):
+        print(f"[Deleteing... ] {path}")
+        shutil.rmtree(path)
     if CONSTANTS.verbose_loading:
-        print(f"[Creating... ] {path}")
+        print(f"[Creating... ] {path}")   
     os.makedirs(path, exist_ok=True)
+
+
+def load_df(path, col_list):
+    """
+
+    Args:
+        path: a str
+
+    Returns:
+        dataframe
+    """
+    if CONSTANTS.verbose_loading:
+        print(f"[Loading Dataframe... ] {path}")
+
+    lst = os.listdir(path)
+    dfs = []
+    for i in lst:
+        rows = load_json(f'{path}/{i}')
+        tmp = pd.DataFrame(
+            [dict(zip(col_list, row)) for row in rows]
+        )
+        dfs.append(tmp)
+
+    df = pd.concat(dfs, ignore_index=True)
+    return df
+
+
