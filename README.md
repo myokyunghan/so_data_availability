@@ -70,6 +70,6 @@
    'dbname'    : "input name for your database",
    'user'      : "input username for your database",
    'password'  : "input password for your database",
-   'schema'   : : "input schema for your database",
+   'schema'    : "input schema for your database",
    }
    ```
