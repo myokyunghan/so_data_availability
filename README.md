@@ -59,3 +59,17 @@
    # in the 'so_data_availability' directory
    pip install -e .
    ```
+
+
+6. Setting the configuration of database
+   you need to input the configuration of the database, which is located in `so_data_availability/setting_for_sda/config.py`
+
+    ```python
+   database_info={
+   'host'      : "input ip adress for your database",
+   'dbname'    : "input name for your database",
+   'user'      : "input username for your database",
+   'password'  : "input password for your database",
+   'schema'   : : "input schema for your database",
+   }
+   ```

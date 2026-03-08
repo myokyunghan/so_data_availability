@@ -94,7 +94,7 @@ class CONSTANTS:
     # snapshot2 data
     bert_monthly_data_dir_3 = f"{data_root_dir}/result/bert_based/run_id_3/data"
 
-    
+    ##tag result dirs
     tag_monthly_data_dir    = f"{data_root_dir}/result/tag/run_id_0/data"
     #2021.11 ~ 2024.11
     tag_monthly_data_dir_2  = f"{data_root_dir}/result/tag/run_id_2/data"
@@ -102,11 +102,13 @@ class CONSTANTS:
     tag_monthly_data_dir_2_py  = f"{data_root_dir}/result/tag/run_id_2/python/data"
     tag_monthly_data_dir_2_cpp  = f"{data_root_dir}/result/tag/run_id_2/cpp/data"
 
+    ##LDA result dirs
     lda_monthly_data_dir = f"{data_root_dir}/result/lda/run_id_1/data"
 
+    ##topic.tag X Difficulty result dirs
     bert_difficulty_data_dir = f"{data_root_dir}/result/bert_based/difficulty_annotated/data"
     lda_difficulty_data_dir = f"{data_root_dir}/result/lda/difficulty_annotated/data"
-    tag_difficulty_data_dir = f"{data_root_dir}/result/bert_based/difficulty_annotated/data"
+    tag_difficulty_data_dir = f"{data_root_dir}/result/tag/difficulty_annotated/data"
 
     all_topics_list = list(range(0, 50))
 
