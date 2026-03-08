@@ -32,7 +32,7 @@ class RunnerOptions:
                                         "model" : 'BERTopic',
                                         "year_range" : year_range,
                                         "data_dir": f"{path_list['data_root_dir']}/data/{snapshot}/questions/python/{year_range}",    
-                                        "save_dir": f"{path_list['data_root_dir']}/result/bert_based/run_id_{run_id}/data",    
+                                        "save_dir": f"{path_list['data_root_dir']}/result/bert_based/run_id_{run_id}",    
                                         "selected_tags": None,
                                         "snapshot": f"{snapshot}",
                                         "model_option": {
@@ -56,7 +56,7 @@ class RunnerOptions:
                                 "model" : 'LDA',
                                 "year_range" : year_range,
                                 "data_dir": f"{path_list['data_root_dir']}/data/{snapshot}/questions/python/{year_range}",    
-                                "save_dir": f"{path_list['data_root_dir']}/result/lda/run_id_{run_id}/data",    
+                                "save_dir": f"{path_list['data_root_dir']}/result/lda/run_id_{run_id}",    
                                 "selected_tags": None,
                                 "snapshot": f"{snapshot}",
                                 "model_option": {
@@ -76,7 +76,7 @@ class RunnerOptions:
                                 "model" : 'tag',
                                 "year_range" : year_range,
                                 "data_dir": f"{path_list['data_root_dir']}/data/{snapshot}/questions/python/{year_range}",    
-                                "save_dir": f"{path_list['data_root_dir']}/result/tag/run_id_{run_id}/data",    
+                                "save_dir": f"{path_list['data_root_dir']}/result/tag/run_id_{run_id}",    
                                 "selected_tags": "python",
                                 "snapshot": f"{snapshot}"
                             }

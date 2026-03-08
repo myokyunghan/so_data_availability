@@ -1,5 +1,5 @@
 import re
-from utils.datetime_handler import (is_weekday, is_target_weekday, get_const_to_date, get_creationdate_to_date)
+from lib.utils.datetime_handler import (is_weekday, is_target_weekday, get_const_to_date, get_creationdate_to_date)
 
 
 def get_sublist_of_desired_date_range(list_, date_range, weekday_list):

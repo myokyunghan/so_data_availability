@@ -2,11 +2,11 @@ from matplotlib import pyplot as plt
 from tqdm import tqdm
 import random
 import numpy as np
-from utils.sublist import get_sublist_of_desired_date_range, \
+from lib.utils.sublist import get_sublist_of_desired_date_range, \
     get_sublist_of_desired_tags
-from utils.statistics import calculate_gini, get_fractional_values_dict
-from utils.datetime_handler import *
-from utils.data_loader import DataLoader
+from lib.utils.statistics import calculate_gini, get_fractional_values_dict
+from lib.utils.datetime_handler import *
+from lib.utils.data_loader import DataLoader
 
 data_dir = "../data/questions_with_statistics"
 color_map = plt.get_cmap("brg")

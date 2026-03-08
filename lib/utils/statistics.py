@@ -3,7 +3,7 @@ import numpy as np
 from scipy.stats import entropy
 from glob import glob
 import statsmodels.api as sm
-from utils.file_io import *
+from lib.utils.file_io import *
 
 
 def get_fractional_values_dict(dict_, denominator=None):

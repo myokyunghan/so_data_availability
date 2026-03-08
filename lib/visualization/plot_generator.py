@@ -182,10 +182,10 @@ class PlotGen:
         plt.close(fig)
 
 if __name__ == "__main__":
-    from utils.data_loader import DataLoader
-    from utils.statistics import *
-    from utils.datetime_handler import *
-    from utils.utils import *
+    from lib.utils.data_loader import DataLoader
+    from lib.utils.statistics import *
+    from lib.utils.datetime_handler import *
+    from lib.utils.utils import *
     dir_root_bert = "../result/bert_based/run_id_0/data"
     dir_root_lda = "../result/lda/run_id_1/data"
     def get_top_and_bottom_topics(data_dir):

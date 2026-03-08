@@ -5,8 +5,8 @@ from topic_modeling.bert_based_models import load_bert_based_model_from_option
 from topic_modeling.lda_model import load_lda_model_from_option
 from run_project.options import RunnerOptions
 from setting_for_sda.constants import CONSTANTS
-from utils.file_io import load_json, save_json
-from utils.sublist import (get_sublist_of_desired_date_range,
+from lib.utils.file_io import load_json, save_json
+from lib.utils.sublist import (get_sublist_of_desired_date_range,
                          get_sublist_of_desired_tags)
 
 

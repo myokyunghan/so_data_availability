@@ -26,6 +26,7 @@ class ModelRunner:
         self.create_view('create_v_tag_proportion', (self.startdate, self.end_date, f'%<{self.lang}>%'))
         rows = self.select_data('select_v_tag_proportion')
         self.save_data(rows)
+        self.save_option()
         
 
     def create_view(self, sql_id, params=None):
@@ -67,12 +68,22 @@ class ModelRunner:
             start_idx = i * self.save_length
             end_idx = (i + 1) * self.save_length
             to_save = rows[start_idx:end_idx]
-            save_json(to_save, f"{self.save_dir}/{i}.json")
+            save_json(to_save, f"{self.save_dir}/data/{i}.json")
         if length - iters * self.save_length > 0:
             start_idx = iters * self.save_length
             to_save = rows[start_idx:]
-            save_json(to_save, f"{self.save_dir}/{iters}.json")
+            save_json(to_save, f"{self.save_dir}/data/{iters}.json")
         print(f"[Saving data...] Saved to {self.save_dir}")
+
+
+    def save_option(self):
+        """
+
+        Returns:
+            None
+        """
+        save_json(self.runner_opt.user_opt, f'{self.save_dir}/option.json')
+        print(f"[Saving data...] Saved to runner option to {self.save_dir}/option.json")
 
 ## for test
 if __name__ == '__main__':

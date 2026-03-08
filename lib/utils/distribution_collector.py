@@ -1,8 +1,8 @@
-from utils.datetime_handler import *
-from utils.statistics import (get_monthly_topics_counts, get_topics_counts,
+from lib.utils.datetime_handler import *
+from lib.utils.statistics import (get_monthly_topics_counts, get_topics_counts,
                               get_tags_counts, get_fractional_values_dict)
-from utils.file_io import *
-from utils.sublist import get_sublist_of_desired_date_range, \
+from lib.utils.file_io import *
+from lib.utils.sublist import get_sublist_of_desired_date_range, \
     get_sublist_of_desired_difficulties
 import sys, os
 
