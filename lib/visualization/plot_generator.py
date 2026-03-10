@@ -2,7 +2,9 @@ import os.path
 import numpy as np
 from matplotlib import pyplot as plt
 import seaborn as sns
-from constants import CONSTANTS
+from setting_for_sda.color_setting import Color_Setting
+from lib.utils.statistics import *
+import lib.stats.stats as st
 
 
 class PlotGen:
@@ -13,7 +15,7 @@ class PlotGen:
             self.save_dir_root = "./figs"
         if not os.path.exists(self.save_dir_root):
             os.makedirs(self.save_dir_root)
-        self.colors = CONSTANTS.pyplot_color_palette
+        self.colors = Color_Setting.color_list
 
     @staticmethod
     def save_figure(path, fig):
@@ -180,6 +182,82 @@ class PlotGen:
         self.set_title_and_labels(title, x_label, y_label)
         self.save_figure(f"{self.save_dir_root}/{title}.png", fig)
         plt.close(fig)
+        
+    def draw_regression(self, ax, title, series): 
+        x_rel, divider = get_dist_x_div(series)
+
+        reg_bf = calc_regression_with_ci(x_rel[:divider], series[:divider])
+        reg_af = calc_regression_with_ci(x_rel[divider:], series[divider:])
+
+        bf = reg_bf["pred_summary"]
+        af = reg_af["pred_summary"]
+
+        ax.scatter(x_rel, series, color='darkgray', alpha=0.7, s=10, marker='x')
+
+        ax.plot(x_rel[:divider], bf["mean"], linewidth=2)
+        ax.plot(x_rel[divider:], af["mean"], linewidth=2)
+
+        ax.fill_between(x_rel[:divider], bf["mean_ci_lower"], bf["mean_ci_upper"], alpha=0.1)
+        ax.fill_between(x_rel[divider:], af["mean_ci_lower"], af["mean_ci_upper"], alpha=0.1)
+
+        ax.axvline(x=0, color='tab:red', linestyle='-.', linewidth=1)
+
+        # chow test
+        st_0 = st.Stats(np.arange(-52, 52), series, 2, 0.95)
+        F_stat, p_value = st_0.chow_test()
+
+        p_txt = '($p < 0.001$)' if p_value < 0.001 else f'($p = {p_value:.3f}$)'
+
+        ax.text(
+            0.5, 1.05,
+            f"Changes in {title} (topic)",
+            ha='center',
+            fontsize=22,
+            transform=ax.transAxes
+        )
+
+        ax.text(
+            0.5, 1.00,
+            p_txt,
+            ha='center',
+            fontsize=15,
+            transform=ax.transAxes
+        )
+
+        ax.tick_params(axis='both', labelsize=16)
+
+    def draw_topic_stack(self, ax, title, proportion, order_list, colors, alpha):
+        
+        rel_week = sorted(proportion['rel_week'].unique())
+        bottom = np.zeros(len(rel_week))
+
+        for idx, topic in enumerate(order_list):
+
+            t_p = proportion[proportion['Topic'] == topic]
+
+            count_full = np.zeros(len(rel_week))
+            for i, rw in enumerate(t_p['rel_week']):
+                if rw in rel_week:
+                    rw_idx = rel_week.index(rw)
+                    count_full[rw_idx] = t_p.loc[t_p['rel_week'] == rw, 'pct'].values[0]
+
+            ax.bar(
+                rel_week,
+                count_full,
+                bottom=bottom,
+                label=topic,
+                color=colors[idx],
+                width=1.0,
+                align='center',
+                alpha=alpha
+            )
+
+            bottom += count_full
+
+        ax.set_ylim(0, bottom.max()*1.05)
+        ax.axvline(x=0, color='tab:red', linestyle='-.', linewidth=1)
+        ax.set_title(title, fontsize=25)
+        ax.tick_params(axis='both', labelsize=16)
 
 if __name__ == "__main__":
     from lib.utils.data_loader import DataLoader
@@ -229,7 +307,8 @@ if __name__ == "__main__":
             to_append = {topic: topic_distribution[topic] for topic in topics}
             to_return.append(to_append)
         return to_return
-
+        
+        
     plot_gen = PlotGen()
     bert_top_10, bert_bottom_10 = get_top_and_bottom_topics(dir_root_bert)
     lda_top_10, lda_bottom_10 = get_top_and_bottom_topics(dir_root_lda)

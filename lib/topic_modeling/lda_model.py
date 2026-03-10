@@ -1,8 +1,7 @@
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation as LDA
-from topic_modeling.preprocess import Preprocessor
-
+from lib.topic_modeling.preprocess import Preprocessor
 
 def load_lda_model_from_option(model_option):
     """

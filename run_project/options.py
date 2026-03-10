@@ -16,8 +16,8 @@ class RunnerOptions:
             raise ValueError("'bert_based' and 'lda' are supported")
         
         # year_range chk
-        if year_range not in (["2021to2023", "2022to2024", "2023to2025" "2021to2024", "2021to2025"]):
-            raise ValueError("We now offer only three options (2021to2023, 2022to2024, 2023to2025) for 'year_range' parameter.\n If you want to add options, please modify 'settings_for_sda.constants.py'")
+        if year_range not in (["2021to2023", "2022to2024", "2023to2025", "2021to2024", "2021to2025"]):
+            raise ValueError("We now offer only three options (2021to2023, 2022to2024, 2023to2025, 2021to2024, 2021to2025) for 'year_range' parameter.\n If you want to add options, please modify 'settings_for_sda.constants.py'")
         
         # snapshot chk
         if snapshot not in (["snapshot1", "snapshot2", "snapshot3", "public_for_260105"]):

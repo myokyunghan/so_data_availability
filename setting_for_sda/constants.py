@@ -5,7 +5,7 @@ class CONSTANTS:
     all_topics_list = list(range(0, 50))
 
     
-#     codebert_languages = ["python", "java", "javascript", "php", "ruby", "go"]
+    codebert_languages = ["python", "java", "javascript", "php", "ruby", "go"]
 #     early_2010s_languages = ["dart", "kotlin", "julia", "typescript",
 #                              "elixir", "swift", "hacklang", "elm",
 #                              "red-lang", "crystal-lang"]

@@ -65,17 +65,21 @@ def load_df(path, col_list):
     """
     if CONSTANTS.verbose_loading:
         print(f"[Loading Dataframe... ] {path}")
-
     lst = os.listdir(path)
     dfs = []
     for i in lst:
         rows = load_json(f'{path}/{i}')
-        tmp = pd.DataFrame(
-            [dict(zip(col_list, row)) for row in rows]
-        )
-        dfs.append(tmp)
 
-    df = pd.concat(dfs, ignore_index=True)
+        if isinstance(rows[0], list):
+            tmp = pd.DataFrame(
+                [dict(zip(col_list, row)) for row in rows]
+            )
+            dfs.append(tmp)
+        elif isinstance(rows[0], dict):
+            tmp = pd.DataFrame(rows)  
+            dfs.append(tmp)
+
+    df = pd.concat(dfs, ignore_index=True)         
     return df
 
 

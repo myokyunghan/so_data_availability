@@ -142,7 +142,7 @@ def collect_top_bottom_tags(df):
     bot_tag = list(df_bf_pro.iloc[:tagnum, 0])
     top_tag = list(df_bf_pro.iloc[tagnum:, 0])
 
-    # stackedbar를 위한 계산 수행 (전체 대비 비율 계산 및 주차별 합산 계산)
+    
     df_tot = df.groupby(['rel_week']).sum(['pct'])['pct'].reset_index(name = 'tot_pct')
     df_pct = pd.merge(df, df_tot, on = 'rel_week')
 

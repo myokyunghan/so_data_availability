@@ -3,6 +3,8 @@ import stanza
 from keyword import kwlist
 from string import punctuation
 from tqdm import tqdm
+import nltk
+from nltk.data import find
 from nltk.corpus import stopwords
 from setting_for_sda.constants import CONSTANTS
 
@@ -210,6 +212,8 @@ class Lemmatizer:
 
 class Preprocessor:
     def __init__(self):
+        
+        self.ensure_nltk_resource("corpora/stopwords", "stopwords")
         self.languages_list = CONSTANTS.codebert_languages
         self.code_section_parser = CodeSectionParser()
         self.html_parser = HTMLParser()
@@ -217,6 +221,23 @@ class Preprocessor:
         self.lemmatizer = Lemmatizer()
         self.stopwords = stopwords.words("english")
         self.reserved_words = kwlist
+
+    def ensure_nltk_resource(self, resource_path, download_name):
+        """
+
+        Args:
+            resource_path: a str
+            download_name: a str
+
+        Returns:
+            None
+        
+        Install the stopword list if it not exists
+        """
+        try:
+            find(resource_path)
+        except LookupError:
+            nltk.download(download_name)
 
     def tokenize_and_remove_invalid_tokens(self, input_str):
         """

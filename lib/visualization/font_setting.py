@@ -2,7 +2,7 @@ from matplotlib import font_manager as fm
 
 def init_font():
     for font in fm.fontManager.ttflist:
-        if 'Helvetica' in font.name: 
+        if 'Helvetica' == font.name: 
             print(font.name, font.fname)
             font_path = font.fname
             break

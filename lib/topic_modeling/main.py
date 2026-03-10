@@ -1,13 +1,13 @@
 import os
 import pprint
 from glob import glob
-from topic_modeling.bert_based_models import load_bert_based_model_from_option
-from topic_modeling.lda_model import load_lda_model_from_option
-from run_project.options import RunnerOptions
-from setting_for_sda.constants import CONSTANTS
+from lib.topic_modeling.bert_based_models import load_bert_based_model_from_option
+from lib.topic_modeling.lda_model import load_lda_model_from_option
 from lib.utils.file_io import load_json, save_json
 from lib.utils.sublist import (get_sublist_of_desired_date_range,
                          get_sublist_of_desired_tags)
+from run_project.options import RunnerOptions
+from setting_for_sda.constants import CONSTANTS
 
 
 
@@ -42,13 +42,13 @@ class ModelRunner:
             None
         """
         self.model_in_run = self.runner_opt.model_in_run
+        self.option = self.runner_opt.user_opt
+
         if self.model_in_run == "bert_based":
-            self.option = self.runner_opt.bert_based_opt
             self.model = load_bert_based_model_from_option(
                 self.option["model_option"]
             )
         elif self.model_in_run == "lda":
-            self.option = self.runner_opt.lda_opt
             self.model = load_lda_model_from_option(
                 self.option["model_option"]
             )
@@ -63,7 +63,7 @@ class ModelRunner:
         """
         run_id = self.option['run_id']
         self.data_dir = self.option['data_dir']
-        self.save_dir = f"{self.option['save_dir']}/run_id_{run_id}"
+        self.save_dir = f"{self.option['save_dir']}"
         os.makedirs(f"{self.save_dir}/data", exist_ok=True)
 
     def load_all_files(self):

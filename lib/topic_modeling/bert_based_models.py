@@ -4,7 +4,7 @@ from bertopic import BERTopic
 from sklearn.cluster import KMeans
 from sklearn.feature_extraction.text import CountVectorizer
 from transformers.pipelines import pipeline
-from topic_modeling.preprocess import Preprocessor
+from lib.topic_modeling.preprocess import Preprocessor
 from sentence_transformers import SentenceTransformer
   
 
