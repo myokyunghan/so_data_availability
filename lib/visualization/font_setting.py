@@ -14,3 +14,9 @@ def init_font():
     return font_name
 
     
+font_setting = {'title' : 22,
+                'p-value' : 15,
+                'panel' : 25,
+                'tick' : 15,
+                'legend':15
+                }

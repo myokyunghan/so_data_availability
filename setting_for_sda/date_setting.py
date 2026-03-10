@@ -24,6 +24,8 @@ def generate_4week_timestamps(std_date, year_range_str):
 
 
 Date_Setting = {
+    "2019to2021": generate_4week_timestamps(datetime(2020,11,30), "2019to2021"),
+    "2020to2022": generate_4week_timestamps(datetime(2021,11,30), "2020to2022"),
     "2021to2023": generate_4week_timestamps(datetime(2022,11,30), "2021to2023"),
     "2022to2024": generate_4week_timestamps(datetime(2023,11,30), "2022to2024"),
     "2023to2025": generate_4week_timestamps(datetime(2024,11,30), "2023to2025"),

@@ -156,3 +156,21 @@ def collect_top_bottom_tags(df):
 
     return {'Top 20% Tags' : df_pct_top_tot,   'Bottom 20% Tags' : df_pct_bot_tot}
 
+
+def proportion_calc_for_topic(df, period, topic):
+       
+    prop_df = pd.merge( df.groupby([period, topic]).count()['id'].reset_index().rename(columns={'id': 'cnt'}),
+                        df.groupby([period]).count()['id'].reset_index().rename(columns={'id': 'tot_cnt'}), on = period)
+    prop_df['proportion'] = prop_df['cnt']/prop_df['tot_cnt']
+
+    return prop_df
+
+
+def collect_top_bottom_topic(df, period, topic, proportion):
+    topic_list = list(df[df[period] <0].groupby(topic).sum()[proportion].reset_index().sort_values(by = proportion, ascending=False)[topic])
+    top10list = topic_list[:10]
+    bot10list = topic_list[-10:]
+    mid30list = np.setdiff1d(np.arange(0,50), top10list)
+    mid30list = np.setdiff1d(mid30list, bot10list)
+
+    return top10list, mid30list, bot10list
