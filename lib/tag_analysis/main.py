@@ -15,8 +15,9 @@ class ModelRunner:
         self.save_length = 10000
         self.lang = self.runner_opt.user_opt['selected_tags']
         self.save_dir = self.runner_opt.user_opt['save_dir']
-        self.startdate = Date_Setting.year_range[self.runner_opt.user_opt['year_range']]["start_date"]
-        self.end_date = Date_Setting.year_range[self.runner_opt.user_opt['year_range']]["end_date"]
+
+        self.startdate = Date_Setting[self.runner_opt.user_opt['year_range']]["start_date"]
+        self.end_date = Date_Setting[self.runner_opt.user_opt['year_range']]["end_date"]
 
     def __call__(self):
         self.run()
