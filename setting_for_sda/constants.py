@@ -6,6 +6,14 @@ class CONSTANTS:
 
     
     codebert_languages = ["python", "java", "javascript", "php", "ruby", "go"]
+
+    languages_from2020to2022=[  "python",   "javascript",   "java",     "c#",       "c++",
+                                "c",        "r",            "php",      "swift",    "kotlin",
+                                "dart",     "typescript",   "go",       "ruby",     "rust",
+                                "scala",    "julia",        "matlab",   "groovy",   "objective-c",
+                                "vb.net",   "assembly",     "haskell",  "delphi",   "lua",
+                                "perl",     "prolog",       "fortran",  "f#",       "solidity"]
+    
 #     early_2010s_languages = ["dart", "kotlin", "julia", "typescript",
 #                              "elixir", "swift", "hacklang", "elm",
 #                              "red-lang", "crystal-lang"]

@@ -54,7 +54,7 @@ def create_dir(path):
     os.makedirs(path, exist_ok=True)
 
 
-def load_df(path, col_list):
+def load_df(path, col_list = None):
     """
 
     Args:

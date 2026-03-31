@@ -105,9 +105,9 @@ class ModelRunner:
         """
         data = self.load_all_files()
         fit_data = self.load_all_files_for_fit()
-        if self.option["selected_tags"] is not None:
-            data = get_sublist_of_desired_tags(data,
-                                               self.option["selected_tags"])
+        # if self.option["selected_tags"] is not None:
+        #     data = get_sublist_of_desired_tags(data,
+        #                                        self.option["selected_tags"])
         result = self.model.run_model_and_get_output_list(data)
         topic_info = self.model.get_topic_info()
         save_json(topic_info, f"{self.save_dir}/topic_info.json")

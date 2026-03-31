@@ -245,215 +245,221 @@ class PlotGen:
         ax.legend(fontsize=font_setting['legend'], frameon=False)
 
         
-    # def draw_regression(self, ax, title, series): 
-    #     x_rel, divider = get_dist_x_div(series)
-
-    #     reg_bf = calc_regression_with_ci(x_rel[:divider], series[:divider])
-    #     reg_af = calc_regression_with_ci(x_rel[divider:], series[divider:])
-
-    #     bf = reg_bf["pred_summary"]
-    #     af = reg_af["pred_summary"]
-
-    #     ax.scatter(x_rel, series, color='darkgray', alpha=0.7, s=10, marker='x')
-
-    #     ax.plot(x_rel[:divider], bf["mean"], linewidth=2)
-    #     ax.plot(x_rel[divider:], af["mean"], linewidth=2)
-
-    #     ax.fill_between(x_rel[:divider], bf["mean_ci_lower"], bf["mean_ci_upper"], alpha=0.1)
-    #     ax.fill_between(x_rel[divider:], af["mean_ci_lower"], af["mean_ci_upper"], alpha=0.1)
-
-    #     ax.axvline(x=0, color='tab:red', linestyle='-.', linewidth=1)
-
-    #     # chow test
-    #     st_0 = st.Stats(np.arange(-52, 52), series, 2, 0.95)
-    #     F_stat, p_value = st_0.chow_test()
-
-    #     p_txt = '($p < 0.001$)' if p_value < 0.001 else f'($p = {p_value:.3f}$)'
-
-    #     ax.text(
-    #         0.5, 1.05,
-    #         f"Changes in {title} (topic)",
-    #         ha='center',
-    #         fontsize=22,
-    #         transform=ax.transAxes
-    #     )
-
-    #     ax.text(
-    #         0.5, 1.00,
-    #         p_txt,
-    #         ha='center',
-    #         fontsize=15,
-    #         transform=ax.transAxes
-    #     )
-
-    #     ax.tick_params(axis='both', labelsize=16)
-
-    def draw_topic_stack(self, ax, title, panel_label, proportion, order_list, colors, alpha=0.9):
-        """
-        개선된 스택 바 차트
-        - 패널 레이블 (A, B, C, D) 추가
-        - 폰트 크기 통일 (Nature/Science 스타일)
-        - axvline 스타일 개선
-        - 그리드 추가로 가독성 향상
-        """
-        rel_week = sorted(proportion['rel_week'].unique())
-        bottom = np.zeros(len(rel_week))
-
+    def draw_topic_stack(self, ax, title, proportion, order_list, c, alpha=0.9, panel_label = ''):
+        
+        x = sorted(list(proportion['rel_week'].unique()))
+        bottom = np.zeros(len(x))
+        
         for idx, topic in enumerate(order_list):
-            t_p = proportion[proportion['Topic'] == topic]
+            t_p = proportion[proportion['Topic'] == topic].copy()
 
-            count_full = np.zeros(len(rel_week))
+            count_full = np.zeros(len(x))
             for i, rw in enumerate(t_p['rel_week']):
-                if rw in rel_week:
-                    rw_idx = rel_week.index(rw)
+                if rw in x:
+                    rw_idx = x.index(rw)
                     count_full[rw_idx] = t_p.loc[t_p['rel_week'] == rw, 'proportion'].values[0]
-
             ax.bar(
-                rel_week,
+                x,
                 count_full,
                 bottom=bottom,
                 label=topic,
-                color=colors[idx],
+                color=c[idx],
                 width=1.0,
                 align='center',
                 alpha=alpha,
-                linewidth=0,          # ← 바 테두리 제거 (깔끔)
+                linewidth=0,         
             )
+            
             bottom += count_full
+
+        # draw chatgpt line
+        self.draw_chatgpt_line(ax)
+        
+        
+        # set panel label
+        self.set_panel_label(ax, panel_label)
+        
+        # set title
+        self.set_title(ax, title)
+
+        # set tick size
+        self.set_tick_size(ax)
+        
+        # set_spine_visible 
+        self.set_spine_visible(ax, False)
+
+        # set_grid_visible
+        self.set_grid_visible(ax, True)
 
         # Y축 범위
         ax.set_ylim(0, bottom.max() * 1.05)
 
-        # ChatGPT 출시 기준선 — 더 얇고 세련되게
-        ax.axvline(x=0, color='#CC3333', linestyle='--', linewidth=1.2, zorder=5)
+    
+    def draw_chatgpt_line(self, ax, linestype = '--', linewidth = 1.2, zorder=5):
+        ax.axvline(x=0, color='tab:red', linestyle=linestype, linewidth=linewidth, zorder = zorder)
+    
+    def set_ylim_range(self, ax, x, y, gap = 0.001, bin = 0.025):
+        y_min = min(y)
+        y_max = max(y)
 
-        # 패널 레이블 (A, B, C, D) — Science 계열 필수
+        bot = np.floor((y_min - gap) * 100) / 100
+        top = np.ceil((y_max + gap) * 100) / 100
+
+        bot = max(0, bot)
+        top = min(1, top)
+
+        ax.set_ylim(bot-gap, top+gap)
+
+        bot_tick = np.floor(bot * 10) / 10
+        top_tick = np.ceil(top * 10) / 10
+        bin = ((top_tick-bot_tick)/4*100)/100
+        ax.set_yticks(np.arange(bot_tick, top_tick+0.000000001, bin))
+
+    
+    def set_panel_label(self, ax, panel_label):
         ax.text(-0.08, 1.08, panel_label,
                 transform=ax.transAxes,
                 fontsize=font_setting['panel'], fontweight='bold',
                 va='bottom', ha='left')
-
-        # 제목
+    
+    def set_title(self, ax, title):
         ax.text(0.5, 1.08, f'{title}',
             transform=ax.transAxes,
             fontsize=font_setting['title'], ha='center', va='bottom')
-
-        # ax.set_title(title, fontsize=font_setting['title'], pad=6)
-
-        # 축 폰트 통일 (7–9pt 권장, Nature/Science 기준)
+        
+    def set_tick_size(self, ax):
         ax.tick_params(axis='both', labelsize=font_setting['tick'])
 
-        # Y축 레이블
-        # ax.set_ylabel('Accumulated topic share', fontsize=9)
+    def set_spine_visible(self, ax, is_visible=True):
+        ax.spines['top'].set_visible(is_visible)
+        ax.spines['right'].set_visible(is_visible)
 
-        # X축 레이블
-        # ax.set_xlabel('Week relative to ChatGPT release', fontsize=9)
+    
+    def set_grid_visible(self, ax, is_visible=True):
+        ax.yaxis.grid(is_visible, linestyle=':', linewidth=0.5, color='gray', alpha=0.5, zorder=0)
+        ax.set_axisbelow(is_visible)
 
-        # 불필요한 테두리 제거 (top, right spine)
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
+    def set_legend(self, ax, is_visible=True):
+        if is_visible:
+            ax.legend(fontsize=font_setting['legend'], frameon=False)
 
-        # 가로 그리드 (옅게)
-        ax.yaxis.grid(True, linestyle=':', linewidth=0.5, color='gray', alpha=0.5, zorder=0)
-        ax.set_axisbelow(True)
-    # def draw_topic_stack(self, ax, title, proportion, order_list, colors, alpha):
+    def draw_tag_bar(self, ax, title, x, y, c, alpha=0.9, panel_label = '', set_ylim = True):
         
-    #     rel_week = sorted(proportion['rel_week'].unique())
-    #     bottom = np.zeros(len(rel_week))
+        # draw bar plot
+        ax.bar(x, y, width=1.0, align='center', alpha=alpha, linewidth=0, color = c)
+        
+        # draw chatgpt line
+        self.draw_chatgpt_line(ax)
+        
+        # set ylim
+        if set_ylim : 
+            self.set_ylim_range(ax, x, y)
+        
+        # set panel label
+        self.set_panel_label(ax, panel_label)
+        
+        # set title
+        self.set_title(ax, title)
 
-    #     for idx, topic in enumerate(order_list):
+        # set tick size
+        self.set_tick_size(ax)
+        
+        # set_spine_visible 
+        self.set_spine_visible(ax, False)
 
-    #         t_p = proportion[proportion['Topic'] == topic]
+        # set_grid_visible
+        self.set_grid_visible(ax, True)
+        
 
-    #         count_full = np.zeros(len(rel_week))
-    #         for i, rw in enumerate(t_p['rel_week']):
-    #             if rw in rel_week:
-    #                 rw_idx = rel_week.index(rw)
-    #                 count_full[rw_idx] = t_p.loc[t_p['rel_week'] == rw, 'proportion'].values[0]
+    def draw_statter_plot(self, ax, x, y, alpha = 0.7, s = 10, marker='x'):
+        ax.scatter(x, y, color='darkgray', alpha=alpha, s=s, marker=marker)
+        
 
-    #         ax.bar(
-    #             rel_week,
-    #             count_full,
-    #             bottom=bottom,
-    #             label=topic,
-    #             color=colors[idx],
-    #             width=1.0,
-    #             align='center',
-    #             alpha=alpha
-    #         )
-
-    #         bottom += count_full
-
-    #     ax.set_ylim(0, bottom.max()*1.05)
-    #     ax.axvline(x=0, color='tab:red', linestyle='-.', linewidth=1)
-    #     ax.set_title(title, fontsize=25)
-    #     ax.tick_params(axis='both', labelsize=16)
-
-if __name__ == "__main__":
-    from lib.utils.data_loader import DataLoader
-    from lib.utils.statistics import *
-    from lib.utils.datetime_handler import *
-    from lib.utils.utils import *
-    dir_root_bert = "../result/bert_based/run_id_0/data"
-    dir_root_lda = "../result/lda/run_id_1/data"
-    def get_top_and_bottom_topics(data_dir):
-        monthly_count = get_monthly_topics_counts(data_dir, list(range(0, 50)))
-        before_gpt_count = {topic: sum(monthly_count[topic][:12]) for topic in monthly_count}
-        sorted_topics = [k for k, v in sorted(before_gpt_count.items(),
-                                              key=lambda item: item[1],
-                                              reverse=True)]
-        return sorted_topics[:10], sorted_topics[-10:]
-
-    def get_topic_distribution_in_date_range(date_range, data_dir, topics):
-        file_list = get_related_files(date_range)
-        list_ = []
-        for i in file_list:
-            file_path = f"{data_dir}/{i}.json"
-            json_list = DataLoader.load_json(file_path)
-            list_ += json_list
-        list_ = get_sublist_of_desired_date_range(list_, date_range)
-        if "bert" in data_dir:
-            to_return = get_topics_counts_bert(list_, topics)
+    def draw_regression_line(self, ax, x, y, apply_chowtest=True):
+        # divider = np.where(np.array(x) == 0)[0][0]
+        x_arr = np.array(x)
+        if 0 in x_arr:
+            divider = np.where(x_arr == 0)[0][0]
         else:
-            to_return = get_topics_counts_lda(list_, topics)
-        to_return = get_fractional_values_dict(to_return)
-        return to_return
-
-    def collect_topic_distribution(window, data_dir, topics):
-        """
-
-        Args:
-            window: window size, which is a positive int
-
-        Returns:
-            a dict, where keys are datetime str and values are distributions
-        """
-        date_str_list = get_datetime_strings_before_and_after_gpt(window)
-        to_return = []
-        for i in range(len(date_str_list)-1):
-            date_range = (date_str_list[i], date_str_list[i+1])
-            topic_distribution = get_topic_distribution_in_date_range(
-                date_range, data_dir, list(range(0, 50)))
-            to_append = {topic: topic_distribution[topic] for topic in topics}
-            to_return.append(to_append)
-        return to_return
+            divider = np.argmin(np.abs(x_arr))
         
+        reg_bf = calc_regression_with_ci(x[:divider], y[:divider])
+        reg_af = calc_regression_with_ci(x[divider:], y[divider:])
         
-    plot_gen = PlotGen()
-    bert_top_10, bert_bottom_10 = get_top_and_bottom_topics(dir_root_bert)
-    lda_top_10, lda_bottom_10 = get_top_and_bottom_topics(dir_root_lda)
-    bert_top_10_res = collect_topic_distribution(7, dir_root_bert, bert_top_10)
-    bert_top_10_res = list(map(lambda x: sum(x.values()), bert_top_10_res))
-    bert_bot_10_res = collect_topic_distribution(7, dir_root_bert,
-                                                 bert_bottom_10)
-    bert_bot_10_res = list(map(lambda x: sum(x.values()), bert_bot_10_res))
-    lda_top_10_res = collect_topic_distribution(7, dir_root_lda, lda_top_10)
-    lda_top_10_res = list(map(lambda x: sum(x.values()), lda_top_10_res))
-    lda_bot_10_res = collect_topic_distribution(7, dir_root_lda,
-                                                lda_bottom_10)
-    lda_bot_10_res = list(map(lambda x: sum(x.values()), lda_bot_10_res))
-    x = list(range(104))
-    plot_gen.draw_scatter_plot(x, bert_top_10_res, title="bert_top_10")
-    plot_gen.draw_scatter_plot(x, lda_top_10_res, title="lda_top_10")
-    plot_gen.draw_scatter_plot(x, bert_bot_10_res, title="bert_bot_10")
-    plot_gen.draw_scatter_plot(x, lda_bot_10_res, title="lda_bot_10")
+        bf = reg_bf["pred_summary"]
+        af = reg_af["pred_summary"]
+
+        ax.plot(x[:divider], bf["mean"], linewidth=2, label='before ChatGPT')
+        ax.plot(x[divider:], af["mean"], linewidth=2, label='after ChatGPT')
+
+        ax.fill_between(x[:divider], bf["mean_ci_lower"], bf["mean_ci_upper"], alpha=0.1)
+        ax.fill_between(x[divider:], af["mean_ci_lower"], af["mean_ci_upper"], alpha=0.1)
+
+
+        if apply_chowtest:
+            # Chow test
+            st_0 = st.Stats(x, y, 2, 0.95, divider)
+            F_stat, p_value = st_0.chow_test()
+            ax.plot(x, st_0.y_predict, linestyle="--", color="black", linewidth=1.5, label='Overall fit')
+
+            p_txt = '$p < 0.001$' if p_value < 0.001 else f'$p = {p_value:.3f}$'            
+            p_color = '#CC3333' if p_value < 0.05 else 'gray'
+            ax.text(0.5, 1.02, p_txt,
+                    ha='center', fontsize=font_setting['p-value'], color=p_color,
+                    transform=ax.transAxes)
+            
+        
+        self.set_legend(ax)
+        
+  
+    def draw_tag_regression(self, ax, title, x, y, c, alpha=0.9, panel_label = ''):
+        self.draw_statter_plot(ax, x, y)
+
+        self.draw_regression_line(ax, x, y)
+    
+        # draw chatgpt line
+        self.draw_chatgpt_line(ax)
+        
+        # set ylim
+        self.set_ylim_range(ax, x, y)
+        
+        # set panel label
+        self.set_panel_label(ax, panel_label)
+        
+        # set title
+        self.set_title(ax, title)
+
+        # set tick size
+        self.set_tick_size(ax)
+        
+        # set_spine_visible 
+        self.set_spine_visible(ax, False)
+
+        # set_grid_visible
+        self.set_grid_visible(ax, True)
+
+    def draw_topic_regression(self, ax, title, x, y, c, alpha=0.9, panel_label = ''):
+        self.draw_statter_plot(ax, x, y)
+
+        self.draw_regression_line(ax, x, y)
+    
+        # draw chatgpt line
+        self.draw_chatgpt_line(ax)
+        
+        # set ylim
+        self.set_ylim_range(ax, x, y)
+        
+        # set panel label
+        self.set_panel_label(ax, panel_label)
+        
+        # set title
+        self.set_title(ax, title)
+
+        # set tick size
+        self.set_tick_size(ax)
+        
+        # set_spine_visible 
+        self.set_spine_visible(ax, False)
+
+        # set_grid_visible
+        self.set_grid_visible(ax, True)
