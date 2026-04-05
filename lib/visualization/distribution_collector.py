@@ -164,14 +164,40 @@ def collect_top_mid_bottom_tags(df, pct_cut = 0.2):
 
     return result
 
-    # df_top_tot = pd.merge(df_tot, df_top, on = 'rel_week', how='left').fillna(0)
-    # df_top_tot['pct_pct'] = df_top_tot['weekly_pct']/df_top_tot['tot_pct']
+def collect_pareto_tags(df, pct_cut = 0.2):
+    """
 
-    # df_bot_tot = pd.merge(df_tot, df_bot, on = 'rel_week', how='left').fillna(0)
-    # df_bot_tot['pct_pct'] = df_bot_tot['weekly_pct']/df_bot_tot['tot_pct']
+    Args:
+        df: calculated dataframe for tag distribution (columns: 'cdate', 'id', 'tag', 'cnt', 'tot_cnt', 'pct')
+        
+    Returns:
+        a list of dict
+    """
+    df_bf_pro = (df[df['rel_week']<0].groupby(['tag']).sum(['pct'])['pct'].sort_values().reset_index())
+    tagnum = int(np.floor(df_bf_pro.shape[0]*pct_cut))
+    
+    top_tag = list(df_bf_pro.iloc[-tagnum:  , 0]) # top pct_cut% tag
+    bot_tag = list(df_bf_pro.iloc[0:-tagnum , 0]) # rest of the topic
+    
 
-    # return {'Top 20% Tags' : df_top_tot[['rel_week', 'pct_pct']],   'Bottom 20% Tags' : df_bot_tot[['rel_week', 'pct_pct']]}
+    df_bot = df[df['tag'].isin(bot_tag)].groupby(['rel_week'])['pct'].sum().reset_index(name = 'weekly_pct')
+    df_top = df[df['tag'].isin(top_tag)].groupby(['rel_week'])['pct'].sum().reset_index(name = 'weekly_pct')
 
+
+    df_tot = df.groupby(['rel_week']).sum(['pct'])['pct'].reset_index(name = 'tot_pct')
+
+    result = {}
+    for label, df_sub in [('Top', df_top), ('Bottom', df_bot)]:
+        df_merged = pd.merge(df_tot, df_sub, on='rel_week', how='left').fillna(0)
+        df_merged['pct_pct'] = df_merged['weekly_pct'] / df_merged['tot_pct']
+        pct_label = int(pct_cut * 100)
+        if label == 'Middle':
+            key = f'Middle {100 - pct_label*2}% Tags'
+        else:
+            key = f'{label} {pct_label}% Tags'
+        result[key] = df_merged[['rel_week', 'pct_pct']]
+
+    return result
 
 def proportion_calc_for_topic(df, period, topic):
        
