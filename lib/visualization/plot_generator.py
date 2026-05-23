@@ -5,18 +5,44 @@ import seaborn as sns
 from setting_for_sda.color_setting import Color_Setting
 from lib.utils.statistics import *
 import lib.stats.stats as st
-from lib.visualization.font_setting import font_setting
+import lib.visualization.figure_setting as figure_setting
+from setting_for_sda.path_setting import path_list
+from setting_for_sda.date_setting import Date_Setting
 
 
 class PlotGen:
-    def __init__(self, save_dir_root=None):
+    def __init__(self, idx = None, model_in_run=None, save_dir_root=None):
         if save_dir_root is not None:
             self.save_dir_root = save_dir_root
         else:
-            self.save_dir_root = "./figs"
+            self.save_dir_root = "./fig"
         if not os.path.exists(self.save_dir_root):
             os.makedirs(self.save_dir_root)
+
+
+        if model_in_run is not None:
+            self.model_in_run = model_in_run
+        else:
+            self.model_in_run = 'tag'
+
+        if idx is not None:
+            self.idx = idx
+            self.visualization_target = f'run_id_{idx}'
+        else:
+            self.idx = 0
+
+        self.viz_dir = f'{path_list["data_root_dir"]}/result/{model_in_run}/{self.visualization_target}'
+
         self.colors = Color_Setting.color_list
+        
+        
+        
+        self.data_dir = f"{self.viz_dir}/data"
+        self.option_dict = load_json(f"{self.viz_dir}/option.json")
+        # self.output_dir = './fig/'
+        # self.date_range = 'Weekly'
+        self.std_date = Date_Setting[self.option_dict['year_range']]['std_date']
+        
 
     @staticmethod
     def save_figure(path, fig):
@@ -212,26 +238,24 @@ class PlotGen:
         # ax.set_title(f'Changes in {title} (topic)', fontsize=font_setting['title'], pad=22)
         ax.text(0.5, 1.08, f'Changes in {title} (topic)',
             transform=ax.transAxes,
-            fontsize=font_setting['title'], ha='center', va='bottom')
+            fontsize=figure_setting['title'], ha='center', va='bottom')
 
         # p-value — 제목 아래 별도 텍스트 (유의 여부에 따라 색상 구분)
         p_color = '#CC3333' if p_value < 0.05 else 'gray'
         ax.text(0.5, 1.02, p_txt,
-                ha='center', fontsize=font_setting['p-value'], color=p_color,
+                ha='center', fontsize=figure_setting['p-value'], color=p_color,
                 transform=ax.transAxes)
                     
         # 패널 레이블
         if panel_label:
             ax.text(-0.08, 1.08, panel_label,
                     transform=ax.transAxes,
-                    fontsize=font_setting['panel'], fontweight='bold',
+                    fontsize=figure_setting.FONT['panel'], fontweight='bold',
                     va='bottom', ha='left')
 
         # X축 레이블
         # ax.set_xlabel('Week relative to ChatGPT release', fontsize=9)
 
-        # 축 폰트
-        ax.tick_params(axis='both', labelsize=font_setting['tick'])
 
         # spine 정리
         ax.spines['top'].set_visible(False)
@@ -242,7 +266,7 @@ class PlotGen:
         ax.set_axisbelow(True)
 
         # 범례 (첫 번째 regression 패널에만 표시하고 싶으면 조건 추가)
-        ax.legend(fontsize=font_setting['legend'], frameon=False)
+        ax.legend(fontsize=figure_setting.FONT['legend'], frameon=False)
 
         
     def draw_topic_stack(self, ax, title, proportion, order_list, c, alpha=0.9, panel_label = ''):
@@ -296,7 +320,8 @@ class PlotGen:
 
     
     def draw_chatgpt_line(self, ax, linestype = '--', linewidth = 1.2, zorder=5):
-        ax.axvline(x=0, color='tab:red', linestyle=linestype, linewidth=linewidth, zorder = zorder)
+        ax.axvline(x=0, color=Color_Setting.std_pallet['event'], linestyle=linestype, linewidth=linewidth, zorder = zorder)
+
     
     def set_ylim_range(self, ax, x, y, gap = 0.001, bin = 0.025):
         y_min = min(y)
@@ -319,20 +344,25 @@ class PlotGen:
     def set_panel_label(self, ax, panel_label):
         ax.text(-0.08, 1.08, panel_label,
                 transform=ax.transAxes,
-                fontsize=font_setting['panel'], fontweight='bold',
+                fontsize=figure_setting.FONT['panel'], fontweight='bold',
                 va='bottom', ha='left')
     
     def set_title(self, ax, title):
         ax.text(0.5, 1.08, f'{title}',
             transform=ax.transAxes,
-            fontsize=font_setting['title'], ha='center', va='bottom')
+            fontsize=figure_setting.FONT['title'], ha='center', va='bottom')
         
     def set_tick_size(self, ax):
-        ax.tick_params(axis='both', labelsize=font_setting['tick'])
+        # ax.tick_params(axis='both', labelsize=figure_setting.FONT['tick'])
+        ax.tick_params(axis='both', labelsize=figure_setting.FONT['label'], width=0.8, length=3, pad=2)
 
     def set_spine_visible(self, ax, is_visible=True):
-        ax.spines['top'].set_visible(is_visible)
-        ax.spines['right'].set_visible(is_visible)
+        for s in ['top', 'right']:
+            ax.spines[s].set_visible(False)
+        ax.spines['left'].set_linewidth(0.9)
+        ax.spines['bottom'].set_linewidth(0.9)
+        ax.spines['left'].set_position(('outward', 3))
+        ax.spines['bottom'].set_position(('outward', 3))
 
     
     def set_grid_visible(self, ax, is_visible=True):
@@ -341,7 +371,7 @@ class PlotGen:
 
     def set_legend(self, ax, is_visible=True):
         if is_visible:
-            ax.legend(fontsize=font_setting['legend'], frameon=False)
+            ax.legend(fontsize=figure_setting.FONT['legend'], frameon=False)
 
     def draw_tag_bar(self, ax, title, x, y, c, alpha=0.9, panel_label = '', set_ylim = True):
         
@@ -361,14 +391,14 @@ class PlotGen:
         # set title
         self.set_title(ax, title)
 
-        # set tick size
-        self.set_tick_size(ax)
+        # # set tick size
+        # self.set_tick_size(ax)
         
         # set_spine_visible 
         self.set_spine_visible(ax, False)
 
         # set_grid_visible
-        self.set_grid_visible(ax, True)
+        self.set_grid_visible(ax, False)
         
 
     def draw_statter_plot(self, ax, x, y, alpha = 0.7, s = 10, marker='x'):
@@ -405,7 +435,7 @@ class PlotGen:
             p_txt = '$p < 0.001$' if p_value < 0.001 else f'$p = {p_value:.3f}$'            
             p_color = '#CC3333' if p_value < 0.05 else 'gray'
             ax.text(0.5, 1.02, p_txt,
-                    ha='center', fontsize=font_setting['p-value'], color=p_color,
+                    ha='center', fontsize=figure_setting.FONT['p-value'], color=p_color,
                     transform=ax.transAxes)
             
         

@@ -24,6 +24,8 @@ class ModelRunner:
         self.data_dir_for_fit = None
         self.save_dir = None
         self.save_length = 10000
+        self.verification = None 
+    
         self.load_option_and_topic_model()
         self.load_dirs_from_option()
 
@@ -108,10 +110,13 @@ class ModelRunner:
         # if self.option["selected_tags"] is not None:
         #     data = get_sublist_of_desired_tags(data,
         #                                        self.option["selected_tags"])
-        result = self.model.run_model_and_get_output_list(data)
+        result, silhouette_score = self.model.run_model_and_get_output_list(data)
         topic_info = self.model.get_topic_info()
         save_json(topic_info, f"{self.save_dir}/topic_info.json")
+        save_json({"silhouette_score": silhouette_score}, f"{self.save_dir}/silhouette_score.json") 
         self.save_data(result)
+
+        
 
     def save_data(self, list_):
         """

@@ -2,6 +2,7 @@ from setting_for_sda.constants import CONSTANTS
 from datetime import datetime, timedelta
 from lib.utils.file_io import *
 import os
+import numpy as np
 
 
 def get_datetime_strings_before_and_after_gpt(window=7):
@@ -120,7 +121,10 @@ def is_target_weekday(date_str, weekday):
 
 
 
-
+def calc_rel_period(df, std_date, date_col = 'cdate', period = 7):
+    df[date_col] = pd.to_datetime(df[date_col], format="mixed")
+    df['rel_week'] = np.floor((df[date_col]-std_date).dt.days/period)
+    return df
 
 if __name__ == '__main__':
     print(get_datetime_strings_before_and_after_gpt(1))

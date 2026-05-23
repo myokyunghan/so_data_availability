@@ -39,11 +39,11 @@ class RunnerOptions:
                                             "model_type": "text",
                                             "clustering": {
                                                 "name": "kmeans",
-                                                "n_clusters": 50,
+                                                "n_clusters": 20,
                                             },
                                             "nr_topics": None,
                                             "vectorizer": "CountVectorizer",
-                                            "embedding_model" : None
+                                            "embedding_model" : 'all-MiniLM-L6-v2'
 
                                         },
                                         "visualization": {

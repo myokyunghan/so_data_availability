@@ -6,6 +6,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 from transformers.pipelines import pipeline
 from lib.topic_modeling.preprocess import Preprocessor
 from sentence_transformers import SentenceTransformer
+from sklearn.metrics import silhouette_score
   
 
 
@@ -43,7 +44,7 @@ def get_components_from_option(model_option):
     if model_option["embedding_model"] is None:
         embedding_model = None
     elif model_option["embedding_model"] == 'all-MiniLM-L6-v2':
-        embedding_model = SentenceTransformer(model_option["embedding_model"])
+        embedding_model = SentenceTransformer(model_option["embedding_model"], device="cuda")
     else:
         raise ValueError(f'embedding_model not supported: '
                          f'{model_option["embedding_model"]}')
@@ -140,6 +141,19 @@ class TextBERTopicModel:
             a pandas DataFrame
         """
         return self.topic_model.get_document_info(docs, df, metadata)
+    
+
+    def calc_silhouette_score(self, embeddings, topics):
+        """
+
+        Args:
+            embeddings: embeddings from topic modeling 
+            topics: topics from topic modeling
+
+        Returns:
+            silhouette_score
+        """
+        return silhouette_score(embeddings, topics)
 
     def run_model(self, list_):
         """
@@ -175,14 +189,23 @@ class TextBERTopicModel:
             to_return["Document"] = model_input
             to_return["Topic"] = topic_prediction
         else:
-
-            self.topic_model.fit_transform(model_input)
+            print("[start]   fit and transform together")
+            topics, probs = self.topic_model.fit_transform(model_input)
+            print("[end]   fit and transform together")
+            print("[start]   get embeddings")
+            embeddings = self.topic_model.embedding_model.embed(model_input)
+            print("[end]   get embeddings")
+            print("[start]   calculate sillhouette score")
+            silhouette_score = self.calc_silhouette_score(embeddings, topics)
+            print("[end]   calculate sillhouette score")
+            print("[start]   get document info")
             to_return = self._get_document_info(docs=model_input,
                                                 df=pd.DataFrame(list_))
+            print("[end]   get document info")
         to_return = to_return[["id", "creationdate", "title", "tags", "body",
                                "Document", "Topic"]]
         to_return = to_return.to_dict(orient="records")
-        return to_return
+        return to_return, silhouette_score
 
 
 class CodeBERTopicModel:

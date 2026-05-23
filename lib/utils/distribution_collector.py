@@ -155,3 +155,5 @@ def collect_tag_distributions(window, tag_info, data_dir, week_day_list=None, op
         if len(topic_distribution) != 0 :
                 to_return.append(topic_distribution)
     return to_return
+
+
