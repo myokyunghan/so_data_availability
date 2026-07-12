@@ -245,6 +245,19 @@ def collect_top_bottom_topic(df, period, topic, proportion):
     return top10list, mid30list, bot10list
 
 
+def get_distribution_by_list(df, sort_list):
+    order_map = {v: i for i, v in enumerate(sort_list)}
+    
+    return_df = df[df['Topic'].isin(sort_list)].copy() 
+    
+    return (
+            return_df
+            .groupby('rel_week')['proportion']
+            .sum()
+            .reset_index(name='proportion')
+        )
+
+
 def sort_distribution_by_list(df, sort_list):
     order_map = {v: i for i, v in enumerate(sort_list)}
     
